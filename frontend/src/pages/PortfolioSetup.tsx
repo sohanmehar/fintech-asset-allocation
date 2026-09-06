@@ -32,7 +32,7 @@ export const PortfolioSetup: React.FC = () => {
 
   // Form State
   const [portfolioName, setPortfolioName] = useState<string>('Alpha Growth & Income Demo Portfolio');
-  const [totalCapital, setTotalCapital] = useState<number>(10000000);
+  const [totalCapital, setTotalCapital] = useState<number | string>(10000000);
   const [riskProfile, setRiskProfile] = useState<'CONSERVATIVE' | 'BALANCED' | 'AGGRESSIVE'>('BALANCED');
 
   // Available Assets & Policies from Backend
@@ -41,7 +41,7 @@ export const PortfolioSetup: React.FC = () => {
 
   // Selected Asset for Adding
   const [selectedSymbol, setSelectedSymbol] = useState<string>('');
-  const [addWeightPct, setAddWeightPct] = useState<number>(10);
+  const [addWeightPct, setAddWeightPct] = useState<number | string>(10);
 
   // Holdings Array
   const [holdings, setHoldings] = useState<EditableHolding[]>([
@@ -57,14 +57,14 @@ export const PortfolioSetup: React.FC = () => {
   ]);
 
   // Policy Parameters Editable Inputs
-  const [maxEquityExposure, setMaxEquityExposure] = useState<number>(60);
-  const [minCashAllocation, setMinCashAllocation] = useState<number>(5);
-  const [maxPortfolioVolatility, setMaxPortfolioVolatility] = useState<number>(15);
-  const [minLiquidityScore, setMinLiquidityScore] = useState<number>(70);
-  const [maxDrawdown, setMaxDrawdown] = useState<number>(20);
-  const [maxIndividualAssetWeight, setMaxIndividualAssetWeight] = useState<number>(30);
-  const [riskAversion, setRiskAversion] = useState<number>(3.0);
-  const [transactionCost, setTransactionCost] = useState<number>(0.1);
+  const [maxEquityExposure, setMaxEquityExposure] = useState<number | string>(60);
+  const [minCashAllocation, setMinCashAllocation] = useState<number | string>(5);
+  const [maxPortfolioVolatility, setMaxPortfolioVolatility] = useState<number | string>(15);
+  const [minLiquidityScore, setMinLiquidityScore] = useState<number | string>(70);
+  const [maxDrawdown, setMaxDrawdown] = useState<number | string>(20);
+  const [maxIndividualAssetWeight, setMaxIndividualAssetWeight] = useState<number | string>(30);
+  const [riskAversion, setRiskAversion] = useState<number | string>(3.0);
+  const [transactionCost, setTransactionCost] = useState<number | string>(0.1);
 
   // Processing & UI Feedback State
   const [analyzing, setAnalyzing] = useState<boolean>(false);
@@ -122,10 +122,11 @@ export const PortfolioSetup: React.FC = () => {
     if (!selectedSymbol) return;
     const existingIdx = holdings.findIndex((h) => h.symbol === selectedSymbol);
     const assetObj = availableAssets.find((a) => a.symbol === selectedSymbol);
+    const numWeight = typeof addWeightPct === 'number' ? addWeightPct : parseFloat(addWeightPct) || 0;
 
     if (existingIdx >= 0) {
       const updated = [...holdings];
-      updated[existingIdx].weightPct += addWeightPct;
+      updated[existingIdx].weightPct += numWeight;
       setHoldings(updated);
     } else {
       setHoldings([
@@ -134,7 +135,7 @@ export const PortfolioSetup: React.FC = () => {
           symbol: selectedSymbol,
           name: assetObj?.name || selectedSymbol,
           assetClass: assetObj?.assetClass || 'EQUITY',
-          weightPct: addWeightPct,
+          weightPct: numWeight,
         },
       ]);
     }
@@ -153,6 +154,7 @@ export const PortfolioSetup: React.FC = () => {
   };
 
   // Computed Totals
+  const totalCapitalNum = typeof totalCapital === 'number' ? totalCapital : parseFloat(totalCapital) || 0;
   const totalAllocationPct = holdings.reduce((sum, h) => sum + h.weightPct, 0);
   const remainingAllocationPct = 100 - totalAllocationPct;
   const equityExposurePct = holdings
@@ -196,15 +198,22 @@ export const PortfolioSetup: React.FC = () => {
     try {
       // 1. Update policy thresholds on backend if modified
       const currentPol = policies.find((p) => p.name === riskProfile);
+      const numEq = typeof maxEquityExposure === 'number' ? maxEquityExposure : parseFloat(maxEquityExposure) || 60;
+      const numCash = typeof minCashAllocation === 'number' ? minCashAllocation : parseFloat(minCashAllocation) || 5;
+      const numVol = typeof maxPortfolioVolatility === 'number' ? maxPortfolioVolatility : parseFloat(maxPortfolioVolatility) || 15;
+      const numLiq = typeof minLiquidityScore === 'number' ? minLiquidityScore : parseFloat(minLiquidityScore) || 70;
+      const numDd = typeof maxDrawdown === 'number' ? maxDrawdown : parseFloat(maxDrawdown) || 20;
+      const numAsset = typeof maxIndividualAssetWeight === 'number' ? maxIndividualAssetWeight : parseFloat(maxIndividualAssetWeight) || 30;
+
       if (currentPol?._id) {
         try {
           await apiService.updateRiskPolicy(currentPol._id, {
-            maxEquityExposure: maxEquityExposure / 100,
-            minCashAllocation: minCashAllocation / 100,
-            maxPortfolioVolatility: maxPortfolioVolatility / 100,
-            minLiquidityScore: minLiquidityScore,
-            maxDrawdown: maxDrawdown / 100,
-            maxIndividualAssetWeight: maxIndividualAssetWeight / 100,
+            maxEquityExposure: numEq / 100,
+            minCashAllocation: numCash / 100,
+            maxPortfolioVolatility: numVol / 100,
+            minLiquidityScore: numLiq,
+            maxDrawdown: numDd / 100,
+            maxIndividualAssetWeight: numAsset / 100,
           });
         } catch (polErr) {
           console.warn('Note updating policy thresholds:', polErr);
@@ -226,7 +235,7 @@ export const PortfolioSetup: React.FC = () => {
       await analyzePortfolio({
         portfolioId: activePortfolio?._id,
         name: portfolioName,
-        totalCapital,
+        totalCapital: totalCapitalNum,
         riskProfile,
         holdings: payloadHoldings,
       });
@@ -312,12 +321,13 @@ export const PortfolioSetup: React.FC = () => {
                   min="10000"
                   step="10000"
                   value={totalCapital}
-                  onChange={(e) => setTotalCapital(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setTotalCapital(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  placeholder="Range: ₹10,000 – ₹1,000,000,000"
                   className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded-lg px-3.5 py-2.5 focus:outline-none focus:border-[#1D5B4B]"
                 />
               </div>
               <span className="text-[10px] text-stone-500 font-medium block">
-                Formatted: {formatCurrency(totalCapital)}
+                Formatted: {formatCurrency(totalCapitalNum)}
               </span>
             </div>
           </div>
@@ -347,14 +357,15 @@ export const PortfolioSetup: React.FC = () => {
                 </select>
               </div>
 
-              <div className="space-y-1 w-28">
+              <div className="space-y-1 w-32">
                 <label className="text-xs font-bold text-stone-600 block">Weight (%)</label>
                 <input
                   type="number"
                   min="1"
                   max="100"
                   value={addWeightPct}
-                  onChange={(e) => setAddWeightPct(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setAddWeightPct(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                  placeholder="Range: 1 – 100%"
                   className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded-lg px-3 py-2 focus:outline-none focus:border-[#1D5B4B]"
                 />
               </div>
@@ -391,7 +402,7 @@ export const PortfolioSetup: React.FC = () => {
                     </tr>
                   ) : (
                     holdings.map((h) => {
-                      const val = (h.weightPct / 100) * totalCapital;
+                      const val = (h.weightPct / 100) * totalCapitalNum;
                       return (
                         <tr key={h.symbol} className="hover:bg-[#FAF9F5]/80">
                           <td className="p-3 font-bold text-[#1C2925]">{h.symbol}</td>
@@ -408,8 +419,9 @@ export const PortfolioSetup: React.FC = () => {
                               max="100"
                               step="0.5"
                               value={h.weightPct}
-                              onChange={(e) => handleWeightChange(h.symbol, parseFloat(e.target.value) || 0)}
-                              className="w-20 text-right bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2 py-1 focus:outline-none focus:border-[#1D5B4B]"
+                              onChange={(e) => handleWeightChange(h.symbol, e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                              placeholder="0 – 100"
+                              className="w-24 text-right bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2 py-1 focus:outline-none focus:border-[#1D5B4B]"
                             />
                             <span className="ml-1 text-stone-500 font-sans">%</span>
                           </td>
@@ -518,7 +530,8 @@ export const PortfolioSetup: React.FC = () => {
                     min="0"
                     max="100"
                     value={maxEquityExposure}
-                    onChange={(e) => setMaxEquityExposure(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setMaxEquityExposure(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    placeholder="Range: 0 – 100%"
                     className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2.5 py-1.5 focus:outline-none focus:border-[#1D5B4B]"
                   />
                   <span className="text-xs font-bold text-stone-500">%</span>
@@ -534,7 +547,8 @@ export const PortfolioSetup: React.FC = () => {
                     min="0"
                     max="100"
                     value={minCashAllocation}
-                    onChange={(e) => setMinCashAllocation(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setMinCashAllocation(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    placeholder="Range: 0 – 100%"
                     className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2.5 py-1.5 focus:outline-none focus:border-[#1D5B4B]"
                   />
                   <span className="text-xs font-bold text-stone-500">%</span>
@@ -550,7 +564,8 @@ export const PortfolioSetup: React.FC = () => {
                     min="0"
                     max="100"
                     value={maxPortfolioVolatility}
-                    onChange={(e) => setMaxPortfolioVolatility(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setMaxPortfolioVolatility(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    placeholder="Range: 0 – 100%"
                     className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2.5 py-1.5 focus:outline-none focus:border-[#1D5B4B]"
                   />
                   <span className="text-xs font-bold text-stone-500">%</span>
@@ -566,7 +581,8 @@ export const PortfolioSetup: React.FC = () => {
                     min="0"
                     max="100"
                     value={minLiquidityScore}
-                    onChange={(e) => setMinLiquidityScore(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setMinLiquidityScore(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    placeholder="Range: 0 – 100 pts"
                     className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2.5 py-1.5 focus:outline-none focus:border-[#1D5B4B]"
                   />
                   <span className="text-xs font-bold text-stone-500">pts</span>
@@ -582,7 +598,8 @@ export const PortfolioSetup: React.FC = () => {
                     min="0"
                     max="100"
                     value={maxDrawdown}
-                    onChange={(e) => setMaxDrawdown(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setMaxDrawdown(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    placeholder="Range: 0 – 100%"
                     className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2.5 py-1.5 focus:outline-none focus:border-[#1D5B4B]"
                   />
                   <span className="text-xs font-bold text-stone-500">%</span>
@@ -598,7 +615,8 @@ export const PortfolioSetup: React.FC = () => {
                     min="0"
                     max="100"
                     value={maxIndividualAssetWeight}
-                    onChange={(e) => setMaxIndividualAssetWeight(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setMaxIndividualAssetWeight(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    placeholder="Range: 0 – 100%"
                     className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2.5 py-1.5 focus:outline-none focus:border-[#1D5B4B]"
                   />
                   <span className="text-xs font-bold text-stone-500">%</span>
@@ -614,7 +632,8 @@ export const PortfolioSetup: React.FC = () => {
                     min="0.1"
                     max="10"
                     value={riskAversion}
-                    onChange={(e) => setRiskAversion(parseFloat(e.target.value) || 1)}
+                    onChange={(e) => setRiskAversion(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    placeholder="Range: 0.1 – 10.0"
                     className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2.5 py-1.5 focus:outline-none focus:border-[#1D5B4B]"
                   />
                 </div>
@@ -629,7 +648,8 @@ export const PortfolioSetup: React.FC = () => {
                     min="0"
                     max="5"
                     value={transactionCost}
-                    onChange={(e) => setTransactionCost(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setTransactionCost(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    placeholder="Range: 0.00 – 5.00%"
                     className="w-full bg-[#FAF9F5] border border-[#E5E3DA] text-[#1C2925] font-mono text-xs font-bold rounded px-2.5 py-1.5 focus:outline-none focus:border-[#1D5B4B]"
                   />
                   <span className="text-xs font-bold text-stone-500">%</span>
@@ -643,7 +663,7 @@ export const PortfolioSetup: React.FC = () => {
         <div className="p-5 bg-white border border-[#E5E3DA] rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs">
           <div className="text-xs text-stone-600 font-medium">
             <span className="font-bold text-[#1C2925]">Ready for Risk Engine Analysis: </span>
-            {holdings.length} assets configured • Total Capital: {formatCurrency(totalCapital)}
+            {holdings.length} assets configured • Total Capital: {formatCurrency(totalCapitalNum)}
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">

@@ -14,6 +14,27 @@
   font-family: 'Playfair Display', Georgia, serif;
 }
 
+/* Hide numerical input spinners globally */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Light font placeholder styling */
+input::placeholder,
+textarea::placeholder {
+  color: #A09B8C;
+  font-weight: 400;
+  font-style: italic;
+  opacity: 0.8;
+}
+
 /* Custom scrollbars for light institutional theme */
 ::-webkit-scrollbar {
   width: 6px;

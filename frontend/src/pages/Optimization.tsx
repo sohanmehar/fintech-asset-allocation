@@ -180,6 +180,7 @@ export const Optimization: React.FC = () => {
                 max="100"
                 value={maxEquityExposure}
                 onChange={(e) => setMaxEquityExposure(parseFloat(e.target.value) || 0)}
+                placeholder="Range: 10 – 100%"
                 className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono transition-colors"
               />
             </div>
@@ -194,6 +195,7 @@ export const Optimization: React.FC = () => {
                 max="50"
                 value={minCashAllocation}
                 onChange={(e) => setMinCashAllocation(parseFloat(e.target.value) || 0)}
+                placeholder="Range: 0 – 50%"
                 className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono transition-colors"
               />
             </div>
@@ -208,6 +210,7 @@ export const Optimization: React.FC = () => {
                 max="50"
                 value={maxPortfolioVolatility}
                 onChange={(e) => setMaxPortfolioVolatility(parseFloat(e.target.value) || 0)}
+                placeholder="Range: 1 – 50%"
                 className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono transition-colors"
               />
             </div>
@@ -222,6 +225,7 @@ export const Optimization: React.FC = () => {
                 max="100"
                 value={minLiquidityScore}
                 onChange={(e) => setMinLiquidityScore(parseFloat(e.target.value) || 0)}
+                placeholder="Range: 0 – 100"
                 className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono transition-colors"
               />
             </div>
@@ -236,6 +240,7 @@ export const Optimization: React.FC = () => {
                 max="5"
                 value={transactionCostRate}
                 onChange={(e) => setTransactionCostRate(parseFloat(e.target.value) || 0)}
+                placeholder="Range: 0.00 – 5.00%"
                 className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono transition-colors"
               />
             </div>
