@@ -22,10 +22,6 @@ The platform continuously monitors multi-factor portfolio risks, calculates tail
 - **Backend API (Render)**: [https://fintech-asset-allocation.onrender.com](https://fintech-asset-allocation.onrender.com)
 - **GitHub Repository**: [https://github.com/sohanmehar/fintech-asset-allocation](https://github.com/sohanmehar/fintech-asset-allocation)
 
-### 🔐 Demo Login Credentials
-- **Role**: Chief Risk Officer
-- **Email**: `risk.officer@capitalguard.internal`
-- **Password**: `demo123` (or click **Sign In** on demo screen)
 
 ---
 
