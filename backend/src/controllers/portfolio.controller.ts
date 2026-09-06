@@ -37,3 +37,15 @@ export const getPortfolioById = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
+
+export const createOrUpdatePortfolio = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const portfolio = await portfolioService.createOrUpdatePortfolio(req.body);
+    res.status(201).json({
+      success: true,
+      data: portfolio,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

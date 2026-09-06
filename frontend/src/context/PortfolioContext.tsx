@@ -8,9 +8,18 @@ interface PortfolioContextType {
   setSelectedPortfolioId: (id: string) => void;
   activePortfolio: Portfolio | null;
   riskReport: RiskReport | null;
+  isAnalyzed: boolean;
+  setIsAnalyzed: (analyzed: boolean) => void;
   loading: boolean;
   error: string | null;
   refreshData: () => Promise<void>;
+  analyzePortfolio: (data: {
+    portfolioId?: string;
+    name: string;
+    totalCapital: number;
+    riskProfile: 'CONSERVATIVE' | 'BALANCED' | 'AGGRESSIVE';
+    holdings: Array<{ symbol: string; weight: number }>;
+  }) => Promise<Portfolio>;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -19,6 +28,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('');
   const [riskReport, setRiskReport] = useState<RiskReport | null>(null);
+  const [isAnalyzed, setIsAnalyzed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,6 +86,32 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   };
 
+  const analyzePortfolio = async (data: {
+    portfolioId?: string;
+    name: string;
+    totalCapital: number;
+    riskProfile: 'CONSERVATIVE' | 'BALANCED' | 'AGGRESSIVE';
+    holdings: Array<{ symbol: string; weight: number }>;
+  }): Promise<Portfolio> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const savedPortfolio = await apiService.savePortfolio(data);
+      await fetchPortfolios();
+      setSelectedPortfolioId(savedPortfolio._id);
+      await fetchRiskReport(savedPortfolio._id);
+      setIsAnalyzed(true);
+      return savedPortfolio;
+    } catch (err: any) {
+      console.error('Error analyzing portfolio:', err);
+      const errMsg = err?.response?.data?.message || err.message || 'Failed to submit portfolio for analysis.';
+      setError(errMsg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <PortfolioContext.Provider
       value={{
@@ -84,9 +120,12 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
         setSelectedPortfolioId,
         activePortfolio,
         riskReport,
+        isAnalyzed,
+        setIsAnalyzed,
         loading,
         error,
         refreshData,
+        analyzePortfolio,
       }}
     >
       {children}

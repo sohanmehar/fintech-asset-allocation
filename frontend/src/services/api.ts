@@ -58,6 +58,17 @@ export const apiService = {
     return res.data.data || res.data;
   },
 
+  savePortfolio: async (data: {
+    portfolioId?: string;
+    name: string;
+    totalCapital: number;
+    riskProfile: 'CONSERVATIVE' | 'BALANCED' | 'AGGRESSIVE';
+    holdings: Array<{ symbol: string; weight: number }>;
+  }): Promise<Portfolio> => {
+    const res = await apiClient.post<ApiResponse<Portfolio>>('/portfolios', data);
+    return res.data.data;
+  },
+
   // Risk Policies
   getRiskPolicies: async (): Promise<RiskPolicy[]> => {
     const res = await apiClient.get<ApiResponse<RiskPolicy[]>>('/risk-policies');

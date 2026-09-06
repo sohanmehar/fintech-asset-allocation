@@ -1,5 +1,6 @@
 import React from 'react';
-import { Menu, ChevronDown, RefreshCw, Search, Sun, Moon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Menu, ChevronDown, RefreshCw, Search, Sun, Moon, Plus } from 'lucide-react';
 import { StatusBadge } from '../ui/StatusBadge';
 import { usePortfolio } from '../../context/PortfolioContext';
 
@@ -46,6 +47,16 @@ export const Topbar: React.FC<TopbarProps> = ({
 
       {/* Right section: Portfolio Selector + Status Badges + Action Buttons + Profile */}
       <div className="flex items-center gap-3 sm:gap-4">
+        {/* New Analysis / Setup Button */}
+        <Link
+          to="/portfolio-setup"
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-[#1D5B4B] hover:bg-[#16483B] text-white rounded-lg text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0"
+          title="Create or Setup Portfolio Analysis"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">New Analysis</span>
+        </Link>
+
         {/* Portfolio Dropdown Selector */}
         <div className="flex items-center gap-2 bg-white border border-[#E5E3DA] rounded-lg px-3 py-1.5 text-xs text-stone-700 relative shadow-2xs">
           <span className="text-stone-400 font-medium hidden md:inline">Portfolio:</span>

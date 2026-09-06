@@ -18,6 +18,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
   const navItems = [
+    { name: 'Portfolio Setup', path: '/portfolio-setup', icon: Sliders },
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Portfolio', path: '/portfolio', icon: PieChart },
     { name: 'Optimisation', path: '/optimization', icon: Sliders },

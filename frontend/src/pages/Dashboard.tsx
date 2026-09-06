@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import type { RiskBreach } from '../types/api';
 import { usePortfolio } from '../context/PortfolioContext';
 import { apiService } from '../services/api';
@@ -29,6 +30,7 @@ import {
   AlertOctagon,
   RefreshCw,
   AlertTriangle,
+  Sliders,
 } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
@@ -229,12 +231,19 @@ export const Dashboard: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
+          <Link
+            to="/portfolio-setup"
+            className="flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-[#EAE8E1] text-[#1C2925] rounded-lg text-xs font-bold transition-all border border-[#E5E3DA] shadow-2xs cursor-pointer"
+          >
+            <Sliders className="w-3.5 h-3.5 text-[#1D5B4B]" />
+            <span>Edit Setup Inputs</span>
+          </Link>
           <button
             onClick={refreshData}
             disabled={loading}
-            className="flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-[#EAE8E1] text-[#1C2925] rounded-lg text-xs font-bold transition-all border border-[#E5E3DA] shadow-2xs cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#1D5B4B] hover:bg-[#16483B] text-white rounded-lg text-xs font-bold transition-all shadow-2xs cursor-pointer"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#1D5B4B] ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-white ${loading ? 'animate-spin' : ''}`} />
             <span>Sync Engine</span>
           </button>
         </div>

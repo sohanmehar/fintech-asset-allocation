@@ -12,6 +12,10 @@
 
 **CapitalGuard** is an enterprise-grade portfolio risk control, asset allocation optimization, and governance terminal designed for wealth management firms, risk officers, and institutional portfolio managers.
 
+Rather than presenting precomputed static results, CapitalGuard features an **Input-Driven Portfolio Analysis Flow** (`/portfolio-setup`):
+```
+USER PORTFOLIO & POLICY INPUT → DYNAMIC BACKEND CALCULATIONS → MULTI-FACTOR RISK RESULTS → POLICY BREACH DETECTOR → MEAN-VARIANCE OPTIMIZER → NON-MUTATING STRESS SCENARIOS → GOVERNANCE ALERTS & REBALANCING ORDERS
+```
 The platform continuously monitors multi-factor portfolio risks, calculates tail-loss metrics (1-Day 95% VaR, Maximum Drawdown), detects policy breaches, runs non-mutating stress scenarios, and generates deterministic rebalancing trade instructions to restore compliance.
 
 ---
@@ -27,11 +31,16 @@ The platform continuously monitors multi-factor portfolio risks, calculates tail
 
 ## ✨ Key Features & Architecture
 
-### 🎨 1. Premium Institutional Wealth Theme
+### 📥 1. Input-Driven Portfolio Setup & Preset Demo (`/portfolio-setup`)
+- **Custom Portfolio Creation**: Users enter portfolio name, capital, currency (`INR ₹`), custom asset allocations/weights (must sum strictly to 100.0%), and 8 editable governance policy parameters.
+- **Safety Demo Shortcut**: `[ LOAD DEMO PORTFOLIO ]` populates input fields with seeded Atlas portfolio holdings without jumping immediately to the dashboard.
+- **Dynamic Backend Analysis**: Clicking `[ ANALYZE PORTFOLIO ]` submits user inputs to the backend Risk Engine which dynamically calculates all risk scores, VaR, volatility, drawdowns, and policy breaches.
+
+### 🎨 2. Premium Institutional Wealth Theme
 - **Light Warm Aesthetic**: Refined warm ivory background (`#F5F4EE`) and cream cards (`#FAF9F5`) matching institutional private banking control terminals.
 - **Deep Forest Green Navigation**: Sidebar (`#0D2923`) with gold badge, line iconography, and editorial typography (`Playfair Display` serif headers & `Inter` sans-serif metric data).
 
-### 📐 2. Multi-Factor Risk Engine (Phase 2)
+### 📐 3. Multi-Factor Risk Engine (Phase 2)
 - **Historical Analysis**: Computes annualized returns and standard deviations from ~500 daily trading observations across multi-asset universes (Equities, Sovereign Bonds, Corporate Credit, Gold, Cash).
 - **Covariance & Correlation**: Symmetric $N \times N$ matrices ensuring positive semi-definite risk properties.
 - **Parametric 1-Day 95% VaR**: Calculates tail-loss exposure ($\text{VaR}_{95} = 1.645 \cdot \sigma_p \cdot V$).
