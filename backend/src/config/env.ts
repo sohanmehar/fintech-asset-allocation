@@ -4,9 +4,6 @@ import path from 'path';
 // Load .env file
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-const ATLAS_DEFAULT_URI =
-  'mongodb://pict_db_user:pict2026@ac-epkojil-shard-00-00.jthperc.mongodb.net:27017,ac-epkojil-shard-00-01.jthperc.mongodb.net:27017,ac-epkojil-shard-00-02.jthperc.mongodb.net:27017/capitalguard?ssl=true&replicaSet=atlas-j0h7uj-shard-0&authSource=admin&appName=PICT-Canteen';
-
 export interface AppConfig {
   port: number;
   mongoUri: string;
@@ -19,12 +16,12 @@ export interface AppConfig {
 
 export const config: AppConfig = {
   port: parseInt(process.env.PORT || '5000', 10),
-  mongoUri: process.env.MONGODB_URI || ATLAS_DEFAULT_URI,
+  mongoUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/capitalguard',
   marketDataProvider: process.env.MARKET_DATA_PROVIDER || 'seeded',
-  jwtSecret: process.env.JWT_SECRET || 'capitalguard_default_secret_2026',
+  jwtSecret: process.env.JWT_SECRET || 'capitalguard_jwt_secret_placeholder',
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
   nodeEnv: process.env.NODE_ENV || 'development',
-  allowMemoryDbFallback: process.env.ALLOW_MEMORY_DB_FALLBACK === 'true',
+  allowMemoryDbFallback: process.env.ALLOW_MEMORY_DB_FALLBACK !== 'false',
 };
 
 export const validateEnv = (): void => {
