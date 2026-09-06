@@ -153,6 +153,11 @@ async function runGovernanceEngineTests() {
       });
 
       assert.strictEqual(updated.maxEquityExposure, 0.65);
+
+      // Restore back to original 0.60 so database state is preserved for demo
+      await governanceService.updateRiskPolicy(policy._id.toString(), {
+        maxEquityExposure: 0.60,
+      });
     });
 
     // 13. Invalid policy rejected

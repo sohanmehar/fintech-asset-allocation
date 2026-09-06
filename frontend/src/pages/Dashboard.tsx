@@ -71,66 +71,76 @@ export const Dashboard: React.FC = () => {
         { symbol: 'CASH', name: 'INR Cash & Liquidity', weight: 0.05, value: 500000, assetClass: 'CASH' },
       ];
 
-  // Risk policy limits
-  const equityBreach = riskReport?.policyEvaluation?.breaches?.find((b: RiskBreach) =>
-    b.type?.toLowerCase().includes('equity')
-  );
+  // Risk policy limits & breaches from API
+  const breachesList: RiskBreach[] = riskReport?.policyEvaluation?.breaches || [];
+  const equityBreach = breachesList.find((b) => b.type?.toLowerCase().includes('equity'));
+  const cashBreach = breachesList.find((b) => b.type?.toLowerCase().includes('cash'));
+  const volBreach = breachesList.find((b) => b.type?.toLowerCase().includes('volatility'));
+  const liqBreach = breachesList.find((b) => b.type?.toLowerCase().includes('liquidity'));
+  const drawdownBreach = breachesList.find((b) => b.type?.toLowerCase().includes('drawdown'));
+
+  // Derive exact policy limits from backend risk report policy evaluation or fallbacks
+  const equityLimitPct = (equityBreach?.limit !== undefined ? equityBreach.limit : 0.60) * 100;
+  const cashLimitPct = (cashBreach?.limit !== undefined ? cashBreach.limit : 0.05) * 100;
+  const volLimitPct = (volBreach?.limit !== undefined ? volBreach.limit : 0.15) * 100;
+  const liqLimitVal = liqBreach?.limit !== undefined ? liqBreach.limit : 70.0;
+  const drawdownLimitPct = (drawdownBreach?.limit !== undefined ? drawdownBreach.limit : 0.20) * 100;
 
   const limitsData: PolicyLimitItem[] = [
     {
       id: 'equity',
       name: 'Equity Exposure',
       currentValue: (riskReport?.metrics?.equityExposure ?? 0.68) * 100,
-      limitValue: 60.0,
+      limitValue: equityLimitPct,
       unit: '%',
-      status: 'BREACH',
+      status: equityBreach ? (equityBreach.severity as any) : 'BREACH',
       limitType: 'MAX',
       formattedCurrent: `${((riskReport?.metrics?.equityExposure ?? 0.68) * 100).toFixed(1)}%`,
-      formattedLimit: '60.0%',
+      formattedLimit: `${equityLimitPct.toFixed(1)}%`,
     },
     {
       id: 'cash',
       name: 'Cash Allocation',
       currentValue: (riskReport?.metrics?.cashAllocation ?? 0.05) * 100,
-      limitValue: 5.0,
+      limitValue: cashLimitPct,
       unit: '%',
-      status: 'PASS',
+      status: cashBreach ? (cashBreach.severity as any) : 'PASS',
       limitType: 'MIN',
       formattedCurrent: `${((riskReport?.metrics?.cashAllocation ?? 0.05) * 100).toFixed(1)}%`,
-      formattedLimit: '5.0%',
+      formattedLimit: `${cashLimitPct.toFixed(1)}%`,
     },
     {
       id: 'volatility',
       name: 'Portfolio Volatility',
       currentValue: portfolioVolatility * 100,
-      limitValue: 15.0,
+      limitValue: volLimitPct,
       unit: '%',
-      status: 'PASS',
+      status: volBreach ? (volBreach.severity as any) : 'PASS',
       limitType: 'MAX',
       formattedCurrent: formatPercentage(portfolioVolatility),
-      formattedLimit: '15.00%',
+      formattedLimit: `${volLimitPct.toFixed(2)}%`,
     },
     {
       id: 'liquidity',
       name: 'Liquidity Score',
       currentValue: liquidityScore,
-      limitValue: 70.0,
+      limitValue: liqLimitVal,
       unit: 'pts',
-      status: 'PASS',
+      status: liqBreach ? (liqBreach.severity as any) : 'PASS',
       limitType: 'MIN',
       formattedCurrent: liquidityScore.toFixed(2),
-      formattedLimit: '70.00',
+      formattedLimit: liqLimitVal.toFixed(2),
     },
     {
       id: 'drawdown',
       name: 'Max Drawdown',
       currentValue: maxDrawdown * 100,
-      limitValue: 20.0,
+      limitValue: drawdownLimitPct,
       unit: '%',
-      status: 'PASS',
+      status: drawdownBreach ? (drawdownBreach.severity as any) : 'PASS',
       limitType: 'MAX',
       formattedCurrent: formatPercentage(maxDrawdown),
-      formattedLimit: '20.00%',
+      formattedLimit: `${drawdownLimitPct.toFixed(2)}%`,
     },
   ];
 
